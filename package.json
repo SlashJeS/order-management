@@ -1,0 +1,14 @@
+{
+  "name": "order-management-system",
+  "version": "1.0.0",
+  "description": "Full-stack order management system with Node.js, Express, PostgreSQL, and React",
+  "scripts": {
+    "start": "docker-compose up",
+    "dev": "concurrently \"cd backend && npm run dev\" \"cd frontend && npm run dev\"",
+    "test": "concurrently \"cd backend && npm test\" \"cd frontend && npm test\"",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+} 
