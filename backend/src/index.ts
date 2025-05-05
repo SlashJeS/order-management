@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { AuthController } from './controllers/auth';
 import { OrderController } from './controllers/order';
+import { ProductController } from './controllers/product';
 import { verifyToken } from './middleware/auth';
 import { rateLimiter } from './middleware/rate-limit';
 import { pool } from './db';
@@ -26,23 +27,21 @@ app.use(rateLimiter);
 // Controllers
 const authController = new AuthController();
 const orderController = new OrderController();
+const productController = new ProductController();
 
 // Routes
 app.post('/auth/register', (req: Request, res: Response) => authController.register(req, res));
 app.post('/auth/login', (req: Request, res: Response) => authController.login(req, res));
 app.get('/auth/me', verifyToken, (req: Request, res: Response) => {
-  res.json({ user: (req as any).user });
+  res.json({ user: req.user });
 });
 
 // Protected routes
-app.post('/orders', verifyToken, (req: Request, res: Response) => orderController.createOrder(req, res));
-app.get('/orders', verifyToken, (req: Request, res: Response) => orderController.getUserOrders(req, res));
+app.post('/orders', verifyToken, (req: Request, res: Response) => orderController.createOrder(req as any, res));
+app.get('/orders', verifyToken, (req: Request, res: Response) => orderController.getUserOrders(req as any, res));
 
 // Product routes
-app.get('/products', verifyToken, (req: Request, res: Response) => {
-  // TODO: Implement product listing
-  res.json([]);
-});
+app.get('/products', verifyToken, (req: Request, res: Response) => productController.getAllProducts(req, res));
 
 // Error handling middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {

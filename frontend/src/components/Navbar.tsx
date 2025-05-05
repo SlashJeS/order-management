@@ -1,58 +1,57 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 const Navbar = () => {
-  const { isAuthenticated, logout } = useAuth();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
 
   return (
-    <nav className="bg-white shadow-sm">
-      <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center h-16">
+    <nav className="bg-white shadow-md">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <Link to="/" className="text-xl font-bold text-gray-800">
+            <Link to="/" className="text-xl font-bold text-indigo-600">
               Order Management
             </Link>
-          </div>
-          <div className="flex items-center space-x-4">
-            {isAuthenticated ? (
-              <>
+            {user && (
+              <div className="ml-10 flex items-center space-x-4">
                 <Link
                   to="/orders"
-                  className="text-gray-600 hover:text-gray-800 px-3 py-2 rounded-md text-sm font-medium"
+                  className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium"
                 >
                   Orders
                 </Link>
                 <Link
                   to="/order/new"
-                  className="text-gray-600 hover:text-gray-800 px-3 py-2 rounded-md text-sm font-medium"
+                  className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium"
                 >
                   New Order
                 </Link>
-                <button
-                  onClick={logout}
-                  className="text-gray-600 hover:text-gray-800 px-3 py-2 rounded-md text-sm font-medium"
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <>
-                <Link
-                  to="/login"
-                  className="text-gray-600 hover:text-gray-800 px-3 py-2 rounded-md text-sm font-medium"
-                >
-                  Login
-                </Link>
-                <Link
-                  to="/register"
-                  className="text-gray-600 hover:text-gray-800 px-3 py-2 rounded-md text-sm font-medium"
-                >
-                  Register
-                </Link>
-              </>
+              </div>
             )}
           </div>
+
+          {user && (
+            <div className="flex items-center space-x-4">
+              <div className="text-sm text-gray-700">
+                <span className="font-medium">{user.name}</span>
+                <span className="mx-2">•</span>
+                <span>Balance: ${user.balance.toFixed(2)}</span>
+              </div>
+              <button
+                onClick={handleLogout}
+                className="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium"
+              >
+                Logout
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </nav>

@@ -1,91 +1,209 @@
 # Order Management System
 
-A full-stack application for managing orders, built with Node.js, Express, PostgreSQL, and React.
+A full-stack order management system built with React, Node.js, and PostgreSQL.
 
-## Features
+## Project Structure
 
-- User authentication (register/login)
-- Product management
-- Order creation and tracking
-- Real-time order status updates
-- Responsive design
+```
+order-management/
+├── frontend/                 # React frontend application
+│   ├── src/
+│   │   ├── components/      # Reusable React components
+│   │   ├── contexts/        # React context providers
+│   │   ├── pages/          # Page components
+│   │   ├── services/       # API services
+│   │   └── App.tsx         # Main application component
+│   ├── package.json
+│   └── tsconfig.json
+│
+├── backend/                  # Node.js backend application
+│   ├── src/
+│   │   ├── controllers/    # Route controllers
+│   │   ├── db/            # Database configuration and migrations
+│   │   ├── middleware/    # Express middleware
+│   │   ├── routes/        # API routes
+│   │   ├── types/         # TypeScript type definitions
+│   │   └── app.ts         # Express application setup
+│   ├── package.json
+│   └── tsconfig.json
+│
+└── docker-compose.yml       # Docker compose configuration
+```
 
-## Tech Stack
+## Database Schema
 
-### Backend
-- Node.js with Express
-- TypeScript
-- PostgreSQL with Knex.js
-- JWT authentication
-- Docker
+```sql
+-- Users table
+CREATE TABLE users (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    balance DECIMAL(10,2) DEFAULT 100.00,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
 
-### Frontend
-- React with TypeScript
-- Vite
-- React Query
-- React Router
-- Tailwind CSS
-- Docker
+-- Products table
+CREATE TABLE products (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(255) NOT NULL,
+    price DECIMAL(10,2) NOT NULL,
+    stock INTEGER NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
 
-## Getting Started
+-- Orders table
+CREATE TABLE orders (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID REFERENCES users(id),
+    product_id UUID REFERENCES products(id),
+    quantity INTEGER NOT NULL,
+    total_price DECIMAL(10,2) NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+```
+
+## Development Setup
 
 ### Prerequisites
 
-- Node.js (v18 or later)
-- Docker and Docker Compose
-- Git
-
-### Installation
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/SlashJeS/order-management.git
-   cd order-management
-   ```
-
-2. Start the application using Docker Compose:
-   ```bash
-   docker-compose up --build
-   ```
-
-3. Access the application:
-   - Frontend: http://localhost:5173
-   - Backend API: http://localhost:3000
-
-## Development
-
-### Backend Development
-
-```bash
-cd backend
-npm install
-npm run dev
-```
+- Node.js (v18 or higher)
+- PostgreSQL (v14 or higher)
+- Docker and Docker Compose (for containerized setup)
 
 ### Frontend Development
 
+1. Navigate to the frontend directory:
 ```bash
 cd frontend
+```
+
+2. Install dependencies:
+```bash
 npm install
+```
+
+3. Create a `.env` file:
+```env
+VITE_API_URL=http://localhost:3000
+```
+
+4. Start the development server:
+```bash
 npm run dev
 ```
 
-## API Documentation
+The frontend will be available at `http://localhost:5173`
+
+### Backend Development
+
+1. Navigate to the backend directory:
+```bash
+cd backend
+```
+
+2. Install dependencies:
+```bash
+npm install
+```
+
+3. Create a `.env` file:
+```env
+PORT=3000
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=order_management
+DB_USER=postgres
+DB_PASSWORD=postgres
+JWT_SECRET=your_jwt_secret
+```
+
+4. Start the development server:
+```bash
+npm run dev
+```
+
+The backend API will be available at `http://localhost:3000`
+
+### Database Setup
+
+1. Create a PostgreSQL database:
+```bash
+createdb order_management
+```
+
+2. Run the database initialization script:
+```bash
+psql -d order_management -f backend/src/db/init.sql
+```
+
+## Docker Setup
+
+To run the entire application using Docker Compose:
+
+1. From the project root, run:
+```bash
+docker-compose up --build
+```
+
+This will start:
+- Frontend container (http://localhost:5173)
+- Backend container (http://localhost:3000)
+- PostgreSQL container (localhost:5432)
+
+To stop all containers:
+```bash
+docker-compose down
+```
+
+## API Endpoints
 
 ### Authentication
-
-- `POST /auth/register` - Register a new user
-- `POST /auth/login` - Login user
-- `GET /auth/me` - Get current user info
-
-### Orders
-
-- `POST /orders` - Create a new order
-- `GET /orders` - Get user's orders
+- POST `/auth/register` - Register a new user
+- POST `/auth/login` - Login user
+- GET `/auth/me` - Get current user info
 
 ### Products
+- GET `/products` - Get all products
+- GET `/products/:id` - Get product by ID
 
-- `GET /products` - Get all products
+### Orders
+- POST `/orders` - Create a new order
+- GET `/orders` - Get user's orders
+
+## Features
+
+- User authentication and authorization
+- Product management
+- Order creation with stock validation
+- User balance management
+- Transaction-based order processing
+- Real-time balance updates
+- Responsive UI with Tailwind CSS
+
+## Technologies Used
+
+- Frontend:
+  - React
+  - TypeScript
+  - Tailwind CSS
+  - React Query
+  - React Router
+  - React Toastify
+
+- Backend:
+  - Node.js
+  - Express
+  - TypeScript
+  - PostgreSQL
+  - JWT Authentication
+
+- Development:
+  - Docker
+  - Docker Compose
+  - Vite
+  - ESLint
+  - Prettier
 
 ## License
 

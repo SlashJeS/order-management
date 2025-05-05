@@ -1,18 +1,15 @@
-FROM node:18-alpine
+FROM node:20
 
 WORKDIR /app
 
-# Install build dependencies
-RUN apk add --no-cache python3 make g++
-
 COPY package*.json ./
 
+# Install dependencies
 RUN npm install
 
 COPY . .
 
-RUN npm run build
-
 EXPOSE 3000
 
+# Use nodemon for development
 CMD ["npm", "run", "dev"] 

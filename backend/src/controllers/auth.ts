@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { z } from 'zod';
 import { pool } from '../db';
@@ -34,10 +34,10 @@ export class AuthController {
       // Hash password
       const hashedPassword = await bcrypt.hash(password, 10);
 
-      // Create user
+      // Create user with default balance
       const result = await pool.query(
-        'INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING id, name, email',
-        [name, email, hashedPassword]
+        'INSERT INTO users (name, email, password, balance) VALUES ($1, $2, $3, $4) RETURNING id, name, email, balance',
+        [name, email, hashedPassword, 100.00]
       );
 
       const user = result.rows[0];
@@ -54,7 +54,8 @@ export class AuthController {
         user: {
           id: user.id,
           name: user.name,
-          email: user.email
+          email: user.email,
+          balance: parseFloat(user.balance)
         }
       });
     } catch (error) {
@@ -71,6 +72,8 @@ export class AuthController {
       const validatedData = loginSchema.parse(req.body);
       const { email, password } = validatedData;
 
+      console.log('Attempting login for email:', email);
+
       // Find user
       const result = await pool.query(
         'SELECT * FROM users WHERE email = $1',
@@ -78,14 +81,19 @@ export class AuthController {
       );
 
       if (result.rows.length === 0) {
+        console.log('User not found:', email);
         return res.status(401).json({ message: 'Invalid credentials' });
       }
 
       const user = result.rows[0];
+      console.log('User found:', { id: user.id, email: user.email });
 
       // Verify password
       const isValidPassword = await bcrypt.compare(password, user.password);
+      console.log('Password validation result:', isValidPassword);
+
       if (!isValidPassword) {
+        console.log('Invalid password for user:', email);
         return res.status(401).json({ message: 'Invalid credentials' });
       }
 
@@ -96,12 +104,15 @@ export class AuthController {
         { expiresIn: '24h' }
       );
 
+      console.log('Login successful for user:', email);
+
       res.json({
         token,
         user: {
           id: user.id,
           name: user.name,
-          email: user.email
+          email: user.email,
+          balance: parseFloat(user.balance)
         }
       });
     } catch (error) {

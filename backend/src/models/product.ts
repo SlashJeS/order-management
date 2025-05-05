@@ -1,7 +1,7 @@
 import db from '../database/connection';
 
 export interface Product {
-  id: number;
+  id: string;
   name: string;
   price: number;
   stock: number;
@@ -13,12 +13,12 @@ export const ProductModel = {
     return db('products').select('*');
   },
 
-  async findById(id: number): Promise<Product | null> {
+  async findById(id: string): Promise<Product | null> {
     const product = await db('products').where('id', id).first();
     return product || null;
   },
 
-  async updateStock(id: number, quantity: number): Promise<Product> {
+  async updateStock(id: string, quantity: number): Promise<Product> {
     const [updatedProduct] = await db('products')
       .where('id', id)
       .decrement('stock', quantity)

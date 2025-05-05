@@ -1,4 +1,3 @@
-import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../services/api';
 import { Link } from 'react-router-dom';
@@ -8,7 +7,6 @@ interface Order {
   product_name: string;
   quantity: number;
   total_price: number;
-  created_at: string;
 }
 
 const OrdersTable = () => {
@@ -16,7 +14,11 @@ const OrdersTable = () => {
     queryKey: ['orders'],
     queryFn: async () => {
       const response = await api.get('/orders');
-      return response.data;
+      // Convert total_price to number for each order
+      return response.data.map((order: any) => ({
+        ...order,
+        total_price: parseFloat(order.total_price)
+      }));
     },
   });
 
@@ -48,9 +50,6 @@ const OrdersTable = () => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Total Price
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Date
-              </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
@@ -64,9 +63,6 @@ const OrdersTable = () => {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                   ${order.total_price.toFixed(2)}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  {new Date(order.created_at).toLocaleDateString()}
                 </td>
               </tr>
             ))}
