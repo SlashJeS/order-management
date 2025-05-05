@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { pool } from '../db';
+import { testPool } from '../__tests__/setup';
 import { User } from '../types';
 
 declare global {
@@ -10,6 +11,8 @@ declare global {
     }
   }
 }
+
+const dbPool = process.env.NODE_ENV === 'test' ? testPool : pool;
 
 export const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -22,7 +25,7 @@ export const verifyToken = async (req: Request, res: Response, next: NextFunctio
     try {
       const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key') as { userId: string };
       
-      const result = await pool.query(
+      const result = await dbPool.query(
         'SELECT id, name, email, balance FROM users WHERE id = $1',
         [decoded.userId]
       );

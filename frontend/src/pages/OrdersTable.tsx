@@ -13,7 +13,7 @@ const OrdersTable = () => {
   const { data: orders, isLoading } = useQuery<Order[]>({
     queryKey: ['orders'],
     queryFn: async () => {
-      const response = await api.get('/orders');
+      const response = await api.get('/api/orders');
       // Convert total_price to number for each order
       return response.data.map((order: any) => ({
         ...order,

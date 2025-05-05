@@ -9,7 +9,10 @@ RUN npm install
 
 COPY . .
 
+# Build TypeScript code
+RUN npm run build
+
 EXPOSE 3000
 
-# Use nodemon for development
-CMD ["npm", "run", "dev"] 
+# Use production start command
+CMD ["npm", "start"] 

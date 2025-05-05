@@ -202,3 +202,107 @@ docker-compose down
   - Docker
   - Docker Compose
   - Vite
+
+## Testing
+
+### Backend Tests
+
+The backend uses Jest for testing. Tests are organized into three categories:
+
+1. **API Tests** (`src/__tests__/api/`): Integration tests for API endpoints
+2. **Controller Tests** (`src/__tests__/controllers/`): Unit tests for controllers
+3. **Transaction Tests** (`src/__tests__/transactions/`): Unit tests for database transactions
+
+To run the backend tests:
+
+1. Navigate to the backend directory:
+```bash
+cd backend
+```
+
+2. Run all tests:
+```bash
+npm test
+```
+
+3. Run tests with coverage:
+```bash
+npm run test:coverage
+```
+
+4. Run specific test files:
+```bash
+npm test -- src/__tests__/api/orders.test.ts
+```
+
+### Frontend Tests
+
+The frontend uses Jest for testing with React Testing Library. Tests are located in the `src/__tests__` directory and include:
+
+- Component tests
+- Context tests
+- Integration tests
+- Mock implementations for:
+  - Local Storage
+  - Intersection Observer
+  - Window Match Media
+  - Environment Variables
+
+To run the frontend tests:
+
+1. Navigate to the frontend directory:
+```bash
+cd frontend
+```
+
+2. Run all tests:
+```bash
+npm test
+```
+
+3. Run tests with coverage:
+```bash
+npm run test:coverage
+```
+
+4. Run tests in watch mode:
+```bash
+npm test -- --watch
+```
+
+### Test Database
+
+The backend tests use a separate test database to avoid affecting the development database. The test database is automatically set up and torn down for each test run.
+
+Make sure your PostgreSQL server is running and accessible with the credentials specified in your `.env` file before running the tests.
+
+### Writing Tests
+
+When writing new tests:
+
+1. Follow the existing test structure and patterns
+2. Use descriptive test names that explain the expected behavior
+3. Test both success and error cases
+4. Clean up test data after each test
+5. Use transactions to ensure test isolation
+
+Example test structure:
+```typescript
+describe('Feature', () => {
+  beforeEach(async () => {
+    // Setup test data
+  });
+
+  afterEach(async () => {
+    // Clean up test data
+  });
+
+  it('should handle success case', async () => {
+    // Test implementation
+  });
+
+  it('should handle error case', async () => {
+    // Test implementation
+  });
+});
+```

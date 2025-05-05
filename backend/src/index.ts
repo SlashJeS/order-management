@@ -30,18 +30,19 @@ const orderController = new OrderController();
 const productController = new ProductController();
 
 // Routes
-app.post('/auth/register', (req: Request, res: Response) => authController.register(req, res));
-app.post('/auth/login', (req: Request, res: Response) => authController.login(req, res));
-app.get('/auth/me', verifyToken, (req: Request, res: Response) => {
+app.post('/api/auth/register', (req: Request, res: Response) => authController.register(req, res));
+app.post('/api/auth/login', (req: Request, res: Response) => authController.login(req, res));
+app.get('/api/auth/me', verifyToken, (req: Request, res: Response) => {
   res.json({ user: req.user });
 });
 
 // Protected routes
-app.post('/orders', verifyToken, (req: Request, res: Response) => orderController.createOrder(req as any, res));
-app.get('/orders', verifyToken, (req: Request, res: Response) => orderController.getUserOrders(req as any, res));
+app.post('/api/orders', verifyToken, (req: Request, res: Response) => orderController.createOrder(req as any, res));
+app.get('/api/orders', verifyToken, (req: Request, res: Response) => orderController.getUserOrders(req as any, res));
 
 // Product routes
-app.get('/products', verifyToken, (req: Request, res: Response) => productController.getAllProducts(req, res));
+app.get('/api/products', verifyToken, (req: Request, res: Response) => productController.getAllProducts(req, res));
+app.post('/api/products', verifyToken, (req: Request, res: Response) => productController.createProduct(req, res));
 
 // Error handling middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
@@ -50,14 +51,18 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 });
 
 // Initialize database connection
-pool.connect()
-  .then(() => {
-    console.log('Connected to PostgreSQL database');
-    app.listen(port, () => {
-      console.log(`Server is running on port ${port}`);
+if (process.env.NODE_ENV !== 'test') {
+  pool.connect()
+    .then(() => {
+      console.log('Connected to PostgreSQL database');
+      app.listen(port, () => {
+        console.log(`Server is running on port ${port}`);
+      });
+    })
+    .catch((err) => {
+      console.error('Error connecting to database:', err);
+      process.exit(1);
     });
-  })
-  .catch((err) => {
-    console.error('Error connecting to database:', err);
-    process.exit(1);
-  }); 
+}
+
+export default app; 

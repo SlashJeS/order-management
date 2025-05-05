@@ -22,7 +22,7 @@ const OrderForm = () => {
   const { data: products } = useQuery<Product[]>({
     queryKey: ['products'],
     queryFn: async () => {
-      const response = await api.get('/products');
+      const response = await api.get('/api/products');
       // Ensure price is a number
       return response.data.map((product: any) => ({
         ...product,
@@ -34,7 +34,7 @@ const OrderForm = () => {
 
   const createOrderMutation = useMutation({
     mutationFn: async (data: { product_id: string; quantity: number }) => {
-      const response = await api.post('/orders', data);
+      const response = await api.post('/api/orders', data);
       return response.data;
     },
     onSuccess: async () => {
@@ -61,6 +61,12 @@ const OrderForm = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Validate quantity
+    if (quantity <= 0) {
+      toast.error('Please enter a valid quantity');
+      return;
+    }
+
     // Validate stock
     const selectedProduct = products?.find(p => p.id === productId);
     if (selectedProduct && quantity > selectedProduct.stock) {
@@ -89,7 +95,7 @@ const OrderForm = () => {
   return (
     <div className="max-w-md mx-auto mt-8 p-6 bg-white rounded-lg shadow-md">
       <h2 className="text-2xl font-bold mb-6 text-center">Create New Order</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4" data-testid="order-form">
         <div>
           <label htmlFor="product" className="block text-sm font-medium text-gray-700">
             Product
@@ -130,10 +136,10 @@ const OrderForm = () => {
         )}
         <button
           type="submit"
-          disabled={createOrderMutation.isPending}
+          disabled={createOrderMutation.isLoading}
           className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
         >
-          {createOrderMutation.isPending ? 'Creating...' : 'Create Order'}
+          {createOrderMutation.isLoading ? 'Creating...' : 'Create Order'}
         </button>
       </form>
     </div>
