@@ -202,9 +202,3 @@ docker-compose down
   - Docker
   - Docker Compose
   - Vite
-  - ESLint
-  - Prettier
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details. 
